@@ -6,19 +6,24 @@ import Filter from '../Filter';
 import { useSelector, useDispatch } from 'react-redux';
 import { filterAction } from '../redux/contacts/contacts-actions';
 import {
-  contactsItem,
+  addContactsItem,
   fetchContacts,
 } from '../redux/contacts/contacts-operations';
+import {
+  getFilter,
+  getItems,
+  getLoad,
+} from '../redux/contacts/contacts-selectors';
 
 function App() {
-  const filter = useSelector(state => state.contacts.filter);
-  const items = useSelector(state => state.contacts.item);
-  const load = useSelector(state => state.contacts.loading);
+  const filter = useSelector(state => getFilter(state));
+  const items = useSelector(state => getItems(state));
+  const load = useSelector(state => getLoad(state));
   const dispatch = useDispatch();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     dispatch(fetchContacts());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function formSubmit(name, phone) {
@@ -27,13 +32,13 @@ function App() {
       return;
     }
 
-    return dispatch(contactsItem({ name, phone }));
+    return dispatch(addContactsItem({ name, phone }));
   }
 
   function getFiltered() {
     const lowerCase = filter && filter.toLowerCase();
-    return items.filter(contact =>
-      contact.name.toLowerCase().includes(lowerCase),
+    return items.filter(
+      contact => contact.name && contact.name.toLowerCase().includes(lowerCase),
     );
   }
 
